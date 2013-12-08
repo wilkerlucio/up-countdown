@@ -1,0 +1,47 @@
+doctype
+html
+  head
+    title Contador Universo Paralello
+    link(rel="stylesheet", type="text/css", href="up.css")
+  body
+    include ./background.svg
+
+    script(src="./bower_components/jquery/jquery.min.js")
+    :coffeescript
+      TARGET_DATE = new Date("2013-12-27 10:00:00 GMT-0300").getTime()
+
+      MINUTE = 60
+      HOUR   = 60 * MINUTE
+      DAY    = 24 * HOUR
+
+      zeroFill = (number, fillSize = 2) ->
+        number = number + ""
+        number = "0" + number while number.length < fillSize
+        number
+
+      timeValue = (ms, factor, rest) ->
+        zeroFill(Math.floor(ms / factor) % rest)
+
+      placeholders =
+        days:    $("#days tspan")
+        hours:   $("#hours tspan")
+        minutes: $("#minutes tspan")
+        seconds: $("#seconds tspan")
+        ms:      $("#milliseconds tspan")
+
+      (animationLoop = ->
+        current = new Date().getTime()
+        fullRemaining = TARGET_DATE - current
+
+        remaining = Math.floor(fullRemaining / 1000)
+
+        placeholders.days.text(timeValue remaining, DAY, 1000)
+        placeholders.hours.text(timeValue remaining, HOUR, 60)
+        placeholders.minutes.text(timeValue remaining, MINUTE, 60)
+        placeholders.seconds.text(timeValue remaining, 1, 60)
+
+        msParts = zeroFill(fullRemaining % 1000, 3).split("")
+        placeholders.ms.get(i).textContent = v for v, i in msParts
+
+        requestAnimationFrame(animationLoop)
+      )()
